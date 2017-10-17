@@ -35,18 +35,15 @@ DOWN = 'down'
 LEFT = 'left'
 RIGHT = 'right'
 
-all_sprites_list = pygame.sprite.Group()
-player = Ship(RED,20,20)
-player.rect.x = 200
-player.rect.y = 300
-all_sprites_list.add(player)
+#CLASSES
+
 
 class Ship(pygame.sprite.Sprite):
 #This class represents a car. It derives from the "Sprite" class in Pygame.
     
     def __init__(self, color, width, height):
         # Call the parent class (Sprite) constructor
-        super().__init__()
+        super(Ship,self).__init__()
         
         # Pass in the color of the car, and its x and y position, width and height.
         # Set the background color and set it to be transparent
@@ -59,6 +56,14 @@ class Ship(pygame.sprite.Sprite):
         
         self.rect = self.image.get_rect()
 	
+# CLASSES END
+
+all_sprites_list = pygame.sprite.Group()
+player = Ship(RED,20,20)
+player.rect.x = 200
+player.rect.y = 300
+all_sprites_list.add(player)
+
 
 def main():
     init()
