@@ -125,7 +125,8 @@ def game_update():
 def game_render():
     all_sprites_list.draw(DISPLAYSURF)
     DISPLAYSURF.fill(BGCOLOR)
-    pygame.display.update()
+    pygame.display.update()#
+	pygame.display.flip()
     FPSCLOCK.tick(FPS)
 
 def drawPressKeyMsg():
