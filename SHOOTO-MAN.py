@@ -18,11 +18,6 @@ from pygame.locals import *
 FPS = 60
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
-CELLSIZE = 20
-assert WINDOWWIDTH % CELLSIZE == 0, "Window width must be a multiple of cell size."
-assert WINDOWHEIGHT % CELLSIZE == 0, "Window height must be a multiple of cell size."
-CELLWIDTH = int(WINDOWWIDTH / CELLSIZE)
-CELLHEIGHT = int(WINDOWHEIGHT / CELLSIZE)
 
 #             R    G    B
 WHITE     = (255, 255, 255)
@@ -31,6 +26,8 @@ RED       = (255,   0,   0)
 GREEN     = (  0, 255,   0)
 DARKGREEN = (  0, 155,   0)
 DARKGRAY  = ( 40,  40,  40)
+PURPLE = ( 150,  50,  204)
+
 BGCOLOR = BLACK
 
 UP = 'up'
@@ -38,24 +35,31 @@ DOWN = 'down'
 LEFT = 'left'
 RIGHT = 'right'
 
-HEAD = 0 # syntactic sugar: index of the worm's head
+all_sprites_list = pygame.sprite.Group()
+player = Ship(RED,20,20)
+player.rect.x = 200
+player.rect.y = 300
+all_sprites_list.add(player)
 
-#
-# GLOBAL VARIABLES used by multiple functions
-#
-# Set a random start point.
-gStartx = random.randint(5, CELLWIDTH - 6)
-gStarty = random.randint(5, CELLHEIGHT - 6)
-gWormCoords = [{'x': gStartx,     'y': gStarty},
-              {'x': gStartx - 1, 'y': gStarty},
-              {'x': gStartx - 2, 'y': gStarty}]
-gDirection = RIGHT
+class Ship(pygame.sprite.Sprite):
+#This class represents a car. It derives from the "Sprite" class in Pygame.
+    
+    def __init__(self, color, width, height):
+        # Call the parent class (Sprite) constructor
+        super().__init__()
+        
+        # Pass in the color of the car, and its x and y position, width and height.
+        # Set the background color and set it to be transparent
+        self.image = pygame.Surface([width, height])
+        self.image.fill(WHITE)
+        self.image.set_colorkey(WHITE)
+ 
+        # Draw the car (a rectangle!)
+        pygame.draw.rect(self.image, color, [0, 0, width, height])
+        
+        self.rect = self.image.get_rect()
+	
 
-gApple = {'x': 0, 'y': 0}
-
-#
-#
-#
 def main():
     init()
     showStartScreen()
@@ -70,7 +74,7 @@ def init():
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
-    pygame.display.set_caption('Wormy')
+    pygame.display.set_caption('SHOOTO-MAN')
     
 def runGame():
     game_init()    
@@ -82,23 +86,20 @@ def runGame():
 
 
 def game_init():
-    global gWormCoords, gDirection, gApple
+    global gShipCords, gDirection, gEnemy
 
     # Set a random start point.
-    gStartx = random.randint(5, CELLWIDTH - 6)
-    gStarty = random.randint(5, CELLHEIGHT - 6)
-    gWormCoords = [{'x': gStartx,     'y': gStarty},
-                  {'x': gStartx - 1, 'y': gStarty},
-                  {'x': gStartx - 2, 'y': gStarty}]
     gDirection = RIGHT
         
-    # Start the gApple in a random place.
-    gApple = getRandomLocation();
+    # Start the gApple in a random place
 
 
 def game_update():
-    global gWormCoords, gDirection, gApple
-
+	
+	
+    all_sprites_list.update()
+	
+	
     for event in pygame.event.get(): # event handling loop
         if event.type == QUIT:
             terminate()
@@ -113,40 +114,12 @@ def game_update():
                 gDirection = DOWN
             elif event.key == K_ESCAPE:
                 terminate()
-
-    # check if the worm has hit itself or the edge
-    if gWormCoords[HEAD]['x'] == -1 or gWormCoords[HEAD]['x'] == CELLWIDTH or gWormCoords[HEAD]['y'] == -1 or gWormCoords[HEAD]['y'] == CELLHEIGHT:
-        return True # game over, return True
-    for wormBody in gWormCoords[1:]:
-        if wormBody['x'] == gWormCoords[HEAD]['x'] and wormBody['y'] == gWormCoords[HEAD]['y']:
-            return True # game over, return True
-
-    # check if worm has eaten an apply
-    if gWormCoords[HEAD]['x'] == gApple['x'] and gWormCoords[HEAD]['y'] == gApple['y']:
-        # don't remove worm's tail segment
-        gApple = getRandomLocation() # set a new gApple somewhere
-    else:
-        del gWormCoords[-1] # remove worm's tail segment
-
-    # move the worm by adding a segment in the gDirection it is moving
-    if gDirection == UP:
-        newHead = {'x': gWormCoords[HEAD]['x'], 'y': gWormCoords[HEAD]['y'] - 1}
-    elif gDirection == DOWN:
-        newHead = {'x': gWormCoords[HEAD]['x'], 'y': gWormCoords[HEAD]['y'] + 1}
-    elif gDirection == LEFT:
-        newHead = {'x': gWormCoords[HEAD]['x'] - 1, 'y': gWormCoords[HEAD]['y']}
-    elif gDirection == RIGHT:
-        newHead = {'x': gWormCoords[HEAD]['x'] + 1, 'y': gWormCoords[HEAD]['y']}
-    gWormCoords.insert(0, newHead)
     # game is not over, return False
     return False
 
 def game_render():
+    all_sprites_list.draw(DISPLAYSURF)
     DISPLAYSURF.fill(BGCOLOR)
-    drawGrid()
-    drawWorm(gWormCoords)
-    drawApple(gApple)
-    drawScore(len(gWormCoords) - 3)
     pygame.display.update()
     FPSCLOCK.tick(FPS)
 
@@ -172,8 +145,8 @@ def checkForKeyPress():
     
 def showStartScreen():
     titleFont = pygame.font.Font('freesansbold.ttf', 100)
-    titleSurf1 = titleFont.render('Wormy!', True, WHITE, DARKGREEN)
-    titleSurf2 = titleFont.render('Wormy!', True, GREEN)
+    titleSurf1 = titleFont.render('SHOOTO-MAN!', True, WHITE, PURPLE)
+    titleSurf2 = titleFont.render('SHOOTO-MAN!', True, RED)
 
     degrees1 = 0
     degrees2 = 0
@@ -199,17 +172,12 @@ def showStartScreen():
             return
         pygame.display.update()
         FPSCLOCK.tick(FPS)
-        degrees1 += 3 # rotate by 3 degrees each frame
-        degrees2 += 7 # rotate by 7 degrees each frame
+        degrees2 += 10 # rotate by 7 degrees each frame
 
 
 def terminate():
     pygame.quit()
     sys.exit()
-
-
-def getRandomLocation():
-    return {'x': random.randint(0, CELLWIDTH - 1), 'y': random.randint(0, CELLHEIGHT - 1)}
 
 
 def showGameOverScreen():
@@ -241,29 +209,6 @@ def drawScore(score):
     DISPLAYSURF.blit(scoreSurf, scoreRect)
 
 
-def drawWorm(gWormCoords):
-    for coord in gWormCoords:
-        x = coord['x'] * CELLSIZE
-        y = coord['y'] * CELLSIZE
-        wormSegmentRect = pygame.Rect(x, y, CELLSIZE, CELLSIZE)
-        pygame.draw.rect(DISPLAYSURF, DARKGREEN, wormSegmentRect)
-        wormInnerSegmentRect = pygame.Rect(x + 4, y + 4, CELLSIZE - 8, CELLSIZE - 8)
-        pygame.draw.rect(DISPLAYSURF, GREEN, wormInnerSegmentRect)
-
-
-def drawApple(coord):
-    x = coord['x'] * CELLSIZE
-    y = coord['y'] * CELLSIZE
-    appleRect = pygame.Rect(x, y, CELLSIZE, CELLSIZE)
-    pygame.draw.rect(DISPLAYSURF, RED, appleRect)
-
-
-def drawGrid():
-    for x in range(0, WINDOWWIDTH, CELLSIZE): # draw vertical lines
-        pygame.draw.line(DISPLAYSURF, DARKGRAY, (x, 0), (x, WINDOWHEIGHT))
-    for y in range(0, WINDOWHEIGHT, CELLSIZE): # draw horizontal lines
-        pygame.draw.line(DISPLAYSURF, DARKGRAY, (0, y), (WINDOWWIDTH, y))
-
-
+	
 if __name__ == '__main__':
     main()
