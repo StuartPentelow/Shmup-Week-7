@@ -1,8 +1,8 @@
 import pygame
  
  
-#             R    G    B
-WHITE     = (255, 255, 255)
+#             R    G    B	A
+WHITE     = (255, 255, 255, 1)
 BLACK     = (  0,   0,   0)
 RED       = (255,   0,   0)
 GREEN     = (  0, 255,   0)
@@ -31,11 +31,20 @@ class Ship(pygame.sprite.Sprite):
 			self.image = pygame.Surface([width, height])
 			self.image.fill(WHITE)
 			self.image.set_colorkey(WHITE)
+			self.image.set_alpha(1)
+			self.rect = self.image.get_rect()
+			screen.blit(self.image, (self.rect.x,self.rect.y)) 
 	 
 			# Draw the car (a rectangle!)
 			pygame.draw.rect(self.image, color, [0, 0, width, height])
         
 			self.rect = self.image.get_rect()
+		
+		def set_Image(self, filename = None):
+			if( filename != None):
+				self.image = pygame.image.load(filename)
+				self.rect = self.image.get_rect()
+		
 		def moveRight(self, pixels):
 			self.rect.x += pixels
 		def moveLeft(self, pixels):
@@ -52,10 +61,11 @@ class Ship(pygame.sprite.Sprite):
 #
 # Variables declarations
 Ship_List = pygame.sprite.Group()
-player = Ship(RED,40,40)
+player = Ship(WHITE,40,40)
 player.rect.x = 300
 player.rect.y = 300
 Ship_List.add(player)
+player.set_Image("ship.png")
 #
 done = False
 while done == False:
@@ -65,13 +75,13 @@ while done == False:
             done = True
 	keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-           player.moveLeft(15)
+           player.moveLeft(10)
         if keys[pygame.K_RIGHT]:
-           player.moveRight(15)
+           player.moveRight(10)
         if keys[pygame.K_UP]:
-           player.moveUp(15)
+           player.moveUp(10)
         if keys[pygame.K_DOWN]:
-           player.moveDown(15)
+           player.moveDown(10)
        
 	
     # write game logic here
