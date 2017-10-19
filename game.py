@@ -43,6 +43,7 @@ class Ship(pygame.sprite.Sprite):
 		def set_Image(self, filename = None):
 			if( filename != None):
 				self.image = pygame.image.load(filename)
+				self.image.set_colorkey(WHITE)
 				self.rect = self.image.get_rect()
 		
 		def moveRight(self, pixels):
@@ -65,7 +66,7 @@ player = Ship(WHITE,40,40)
 player.rect.x = 300
 player.rect.y = 300
 Ship_List.add(player)
-player.set_Image("ship.png")
+player.set_Image("gfx/ship.bmp")
 #
 done = False
 while done == False:
